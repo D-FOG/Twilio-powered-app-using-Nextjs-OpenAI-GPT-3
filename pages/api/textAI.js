@@ -1,6 +1,4 @@
 import {Configuration, OpenAIApi} from 'openai'
-import axios from 'axios'
-// import CircularJSON from 'circular-json'
 export default async function postMethod(req, res){
     const {name, message, messageTitle} = JSON.parse(req.body);
     const endPoint = './data.js';
@@ -24,8 +22,6 @@ export default async function postMethod(req, res){
         console.log('main data: ',textData)
         console.log('from frontend: ', message);
         
-        // const messageData = JSON.stringify(textData);
-        // fetch(endPoint, messageData) 
         res.status(200).json({ textData });
     } catch(error) {
         console.error(error);
