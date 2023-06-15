@@ -3,9 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import {useState} from 'react'
 import 'react-phone-number-input/style.css'
-//import style from '../styles/style.module.css'
 import PhoneInput from 'react-phone-number-input'
-import axios from 'axios'
 
 export default function Home() {
   const [employeeName, setEmployeeName] = useState("");
@@ -24,39 +22,22 @@ export default function Home() {
       message: messageBody,
     }
 
-    // const data2 = {
-    //   number: phoneNumber,
-    //   text: generatedText
-    // }
     const mainObject1 = JSON.stringify(data1);
-    //const mainObject2 = JSON.stringify(data2)
-
-    //console.log(`main: `,mainObject1);
-    //console.log(`main2: `,mainObject2);
-
 
     const endPoint1 = '/api/textAI';
-   // const endPoint2 = 'api/data';
-
     const params1 = {
       method: 'POST',
       body: mainObject1,
     }
 
-    // const params2 = {
-    //   method: 'POST',
-    //   body: mainObject2,
-    // }
-
     const response = await fetch(endPoint1, params1);
-    // const response2 = await fetch(endPoint2, params2);
-
+  
     const myData = await response.json();
     const {textData} = myData;
     setGeneratedText(textData);
-    //const myData2 = await response2.json();
+   
     console.log(`this is data is from openAIApi: ${textData} `)
-    //console.log(`this is my second data: ${JSON.stringify(myData2)} `)
+    
     console.log('text for data api ', generatedText)
 
     const data2 = {
@@ -65,8 +46,6 @@ export default function Home() {
     }
 
     const mainObject2 = JSON.stringify(data2)
-
-    //console.log(`main2: `,mainObject2);
 
     const endPoint2 = 'api/data';
 
@@ -79,30 +58,11 @@ export default function Home() {
     const myData2 = await response2.json();
     console.log(`this is the twilio response to the frontend: ${JSON.stringify(myData2)} `);
     const {err} = myData2;
-    //console.log('error ', err)
+    
     if (!err){
       setSent(true);
     }
-    // console.log(textData)
   }
-  // const handleText = async (event) => {
-  //   event.preventDefault();
-
-  //   const data = {
-  //     text: 'write a short sale pitch',
-  //   }
-
-  //   const mainObject = JSON.stringify(data)
-  //   const endPoint = '/api/textAI';
-  //   const response = await fetch(endPoint, {
-  //     method: 'POST',
-  //     body: mainObject,
-  //   });
-
-  //   const textData = await response.json();
-  //   console.log(JSON.stringify(textData));
-  // }
-  //console.log(process.env.DeepaiKEY)
   return (
     <div className={styles.container}>
       <Head>
@@ -133,7 +93,6 @@ export default function Home() {
             <div className={styles.alert}>Message sent</div>
           )}
           </div>
-          {/* <button className={styles.button} onClick={handleText}>Text AI</button> */}
         </div>
       </div>
     </div>
