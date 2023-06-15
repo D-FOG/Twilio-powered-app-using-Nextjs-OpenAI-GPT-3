@@ -10,7 +10,6 @@ export default function Home() {
   const [phoneNumber, setValue] = useState("");
   const [title, setTitle] = useState("");
   const [messageBody, setMessageBody] = useState("");
-  const [generatedText, setGeneratedText] = useState("");
   const [sent, setSent] = useState(false);
 
   const sendData = async (event) => {
@@ -34,11 +33,8 @@ export default function Home() {
   
     const myData = await response.json();
     const {textData} = myData;
-    setGeneratedText(textData);
    
     console.log(`this is data is from openAIApi: ${textData} `)
-    
-    console.log('text for data api ', generatedText)
 
     const data2 = {
       number: phoneNumber,
