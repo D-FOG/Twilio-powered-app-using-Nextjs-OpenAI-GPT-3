@@ -1,8 +1,108 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import {useState} from 'react'
+import 'react-phone-number-input/style.css'
+//import style from '../styles/style.module.css'
+import PhoneInput from 'react-phone-number-input'
+import axios from 'axios'
 
 export default function Home() {
+  const [employeeName, setEmployeeName] = useState("");
+  const [phoneNumber, setValue] = useState("");
+  const [title, setTitle] = useState("");
+  const [messageBody, setMessageBody] = useState("");
+  const [generatedText, setGeneratedText] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const sendData = async (event) => {
+    event.preventDefault();
+
+    const data1 = {
+      name: employeeName, 
+      messageTitle: title,
+      message: messageBody,
+    }
+
+    // const data2 = {
+    //   number: phoneNumber,
+    //   text: generatedText
+    // }
+    const mainObject1 = JSON.stringify(data1);
+    //const mainObject2 = JSON.stringify(data2)
+
+    //console.log(`main: `,mainObject1);
+    //console.log(`main2: `,mainObject2);
+
+
+    const endPoint1 = '/api/textAI';
+   // const endPoint2 = 'api/data';
+
+    const params1 = {
+      method: 'POST',
+      body: mainObject1,
+    }
+
+    // const params2 = {
+    //   method: 'POST',
+    //   body: mainObject2,
+    // }
+
+    const response = await fetch(endPoint1, params1);
+    // const response2 = await fetch(endPoint2, params2);
+
+    const myData = await response.json();
+    const {textData} = myData;
+    setGeneratedText(textData);
+    //const myData2 = await response2.json();
+    console.log(`this is data is from openAIApi: ${textData} `)
+    //console.log(`this is my second data: ${JSON.stringify(myData2)} `)
+    console.log('text for data api ', generatedText)
+
+    const data2 = {
+      number: phoneNumber,
+      text: textData
+    }
+
+    const mainObject2 = JSON.stringify(data2)
+
+    //console.log(`main2: `,mainObject2);
+
+    const endPoint2 = 'api/data';
+
+    const params2 = {
+      method: 'POST',
+      body: mainObject2,
+    }
+
+    const response2 = await fetch(endPoint2, params2);
+    const myData2 = await response2.json();
+    console.log(`this is the twilio response to the frontend: ${JSON.stringify(myData2)} `);
+    const {err} = myData2;
+    //console.log('error ', err)
+    if (!err){
+      setSent(true);
+    }
+    // console.log(textData)
+  }
+  // const handleText = async (event) => {
+  //   event.preventDefault();
+
+  //   const data = {
+  //     text: 'write a short sale pitch',
+  //   }
+
+  //   const mainObject = JSON.stringify(data)
+  //   const endPoint = '/api/textAI';
+  //   const response = await fetch(endPoint, {
+  //     method: 'POST',
+  //     body: mainObject,
+  //   });
+
+  //   const textData = await response.json();
+  //   console.log(JSON.stringify(textData));
+  // }
+  //console.log(process.env.DeepaiKEY)
   return (
     <div className={styles.container}>
       <Head>
@@ -11,59 +111,31 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+      <div className={styles.formContent}>
+        <div className={styles.header}>
+          <h1>Meeting Inviter</h1>
         </div>
-      </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+        <div >
+          <form className={styles.inputForm} onSubmit={sendData}method='POST'>
+            <input className={styles.input} type='text' name='employeeName' placeholder='Name of employee'onChange={(e) => setEmployeeName(e.target.value)}/>
+            <PhoneInput
+              className={styles.phoneNumber}
+              placeholder='Enter Employee number'
+              value={phoneNumber}
+              onChange={setValue}
+            />
+            <input className={styles.input} type='text' name='messageBody' placeholder='Enter meeting title' onChange={(e) => setTitle(e.target.value)}/>
+            <textarea className={styles.textArea} placeholder='Enter meeting descreiption' rows='10' cols='30' onChange={(e) => setMessageBody(e.target.value)} />
+            <button className={styles.button} type='submit'>Send</button>
+          </form>
+          <div>{sent && (
+            <div className={styles.alert}>Message sent</div>
+          )}
+          </div>
+          {/* <button className={styles.button} onClick={handleText}>Text AI</button> */}
+        </div>
+      </div>
     </div>
   )
 }
